@@ -1,0 +1,52 @@
+#form {
+  background-color: rgba(152, 251, 152, 0.5);
+  border: 0.2em solid #2e8b57;
+  border-radius: 0.8em;
+  float: right;
+  margin: 2em;
+  margin-top: 3em;
+  width: 50%;
+  $alphabet_color: #2e8b57;
+  h2 {
+    color: $alphabet_color;
+    text-align: center;
+  }
+  label {
+    color: $alphabet_color;
+    font-weight: bold;
+    margin-left: 0.8em;
+    text-align: left;
+  }
+  input {
+    background-color: #fafad2;
+    border: 0.1em solid #2e8b57;
+    border-radius: 0.5em;
+    display: block;
+    margin: 0.2em 1em;
+    padding: 0.5em 0.2em;
+    width: 95%;
+    font-style: italic;
+  }
+  button {
+    background-color: #fafad2;
+    border: 0.2em solid $alphabet_color;
+    border-radius: 0.5em;
+    color: $alphabet_color;
+    font-weight: bold;
+    margin-left: 25%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    padding: 1em;
+    width: 50%;
+    &:hover {
+      background-color: rgba(152, 251, 152, 0.3);
+      color: $alphabet_color;
+    }
+  }
+}
+
+img {
+  width: 30%;
+  height: auto;
+  margin: 2% 7%;
+}

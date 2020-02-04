@@ -1,0 +1,136 @@
+$background_color: #2e8b57;
+$background_block_color: #eee8aa;
+// nav {
+//   background-color: #00f;
+//   overflow: hidden;
+//   padding: 1em;
+
+//   a {
+//     color: #fff;
+//   }
+
+//   a:visited {
+//     color: #fff;
+//   }
+
+//   border-bottom: 1px solid #000;
+
+//   .navWide {
+//     display: none;
+//     margin: 0 auto;
+
+//     .wideDiv {
+//       text-align: center;
+
+//       a {
+//         text-decoration: none;
+//         display: inline-block;
+//         // Adjust padding to increase/decrease the space between links.
+//         padding: 0 2em;
+//       }
+//     }
+//   }
+
+//   // Navbar is set to default with the "hamburger" and links on the left
+//   // side of the screen. To move to the right of the screen, simply
+//   // change the three "float: Left;" references to read "float: right;".
+//   .navNarrow {
+//     i {
+//       float: left;
+//       cursor: pointer;
+//       color: #fff;
+//     }
+
+//     .narrowLinks {
+//       display: none;
+
+//       a {
+//         text-decoration: none;
+//         display: block;
+//         float: left;
+//         clear: left;
+//         padding: 0.5em 0;
+//       }
+//     }
+//   }
+// }
+
+// Adjust breakpoint as desired to select when the "hamburger" menu is
+// replaced by just the links.
+@media (min-width: 480px) {
+  nav {
+    .navWide {
+      display: block;
+    }
+
+    .navNarrow {
+      display: none;
+    }
+  }
+}
+
+/*new*/
+
+ul {
+  border: 0.1em solid #2e8b57;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+$alphabet_color: #2e8b57;
+li {
+  float: left;
+  border-right: 0.2em solid #2e8b57;
+  display: block;
+  color: $alphabet_color;
+  text-align: center;
+  padding: 14px 16px;
+  font-size: 1em;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #fffacd;
+  }
+
+  &.active {
+    padding: 1.25em;
+    background-color: #fafad2;
+  }
+
+  button {
+    background-color: #fafad2;
+    border: 1px solid #3cb371;
+    border-radius: 0.3em;
+    color: $alphabet_color;
+    font-style: italic;
+    font-weight: bold;
+    padding: 0.5em;
+  }
+}
+
+h1 {
+    color: $alphabet_color;
+    text-align: center;
+}
+
+#back_button {
+    background: none;
+    border: none;
+    padding: 0em;
+    margin: 0em;
+    width: 100%;
+
+    img {
+        width: 2.5em;
+        height: 1.9em;
+    }
+}
+
+.right_float {
+    border-left: 0.2em solid #2e8b57;
+    border-right: none;
+    float: right;
+    font-style: italic;
+}
