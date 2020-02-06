@@ -2,15 +2,18 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom'
 import { User } from '../../models/user';
+import Result from '../common/Result';
 import '../styles/index.scss';
 import '../styles/form.scss';
 
-const url = "http://192.168.1.5:8080/api/user"
+const url = "http://192.168.1.2:8080/api/user"
 
 interface RegistrationState {
     backRedirect: boolean,
     loginRedirect: boolean,
-    user: User
+    user: User,
+    result: string,
+    color: string
 }
 
 export default class Registration extends Component<{}, RegistrationState> {
@@ -27,6 +30,8 @@ export default class Registration extends Component<{}, RegistrationState> {
                 email: "",
                 password: ""
             },
+            result: "",
+            color: "",
         };
     }
 
@@ -53,13 +58,14 @@ export default class Registration extends Component<{}, RegistrationState> {
 
     handleSubmit = (event: { preventDefault: () => void; }) => {
         console.log(`Form submitted`)
-        console.log(this.state.user)
         const user = JSON.stringify(this.state.user)
         console.log(user)
         axios({ method: 'post', url: url, headers: { "Content-Type": "application/json" }, data: user })
             .then((res) => {
-                console.log(res)
-            }).catch((err) => console.log(`ERROR: ${err}`))
+                this.setState({ result: `Успешно се регистрирахте в системата, ${this.state.user.firstName}`, color: "#808000" });
+                setTimeout(this.setLoginRedirect, 3000);
+            }).catch((err) => this.setState({ result: `Неуспешно се регистрирахте в системата, ${this.state.user.firstName}`, color: "#FF0000" }))
+
         event.preventDefault()
     }
 
@@ -100,6 +106,7 @@ export default class Registration extends Component<{}, RegistrationState> {
     }
 
     render() {
+        const { result, color } = this.state
         return (
             <React.Fragment>
                 {this.renderRedirect()}
@@ -113,7 +120,8 @@ export default class Registration extends Component<{}, RegistrationState> {
                             </li>
                             <li className="active">Регистрация</li>
                             <li className="right_float">
-                                Не сте влезнали в профила си? <button id="login" onClick={this.setLoginRedirect}>Вход</button>
+                                Не сте влезнали в профила си?
+                                <button id="login" onClick={this.setLoginRedirect}>Вход</button>
                             </li>
                         </ul>
                     </nav>
@@ -122,35 +130,13 @@ export default class Registration extends Component<{}, RegistrationState> {
                 <main>
                     <img src="robotPlusText.png" alt="Robot plus text" />
                     <form id="form" onSubmit={this.handleSubmit} >
+                        {result && <Result resultText={result} colorHex={color} />}
                         <h2>Регистрационна форма</h2>
-                        <label htmlFor="name">Име:
-                        <input id="name" type="text" name="firstName" placeholder="First name" onChange={this.handleFirstName}
-                            /></label>
-                        <label htmlFor="lastName">Фамилия:<input
-                            id="lastName"
-                            type="text"
-                            name="lastName"
-                            placeholder="Last name"
-                            onChange={this.handleLastName}
-                        /></label>
-                        <label htmlFor="nickname"
-                        >Nickname:<input
-                                id="nickname"
-                                type="text"
-                                name="username"
-                                placeholder="Nickname"
-                                onChange={this.handleUsername}
-                            /></label>
-                        <label htmlFor="email">E-mail:<input id="email" type="email" name="email" placeholder="Email" onChange={this.handleEmail}
-                        /></label>
-                        <label htmlFor="password"
-                        >Парола:<input
-                                id="password"
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                onChange={this.handlePassword}
-                            /></label>
+                        <label htmlFor="name">Име:<input id="name" type="text" name="firstName" placeholder="First name" onChange={this.handleFirstName} required /></label>
+                        <label htmlFor="lastName">Фамилия:<input id="lastName" type="text" name="lastName" placeholder="Last name" onChange={this.handleLastName} /></label>
+                        <label htmlFor="nickname">Nickname:<input id="nickname" type="text" name="username" placeholder="Nickname" onChange={this.handleUsername} required /></label>
+                        <label htmlFor="email">E-mail:<input id="email" type="email" name="email" placeholder="Email" onChange={this.handleEmail} required /></label>
+                        <label htmlFor="password">Парола:<input id="password" type="password" name="password" placeholder="Password" onChange={this.handlePassword} required /></label>
                         <button>Регистрация</button>
                     </form>
                 </main>

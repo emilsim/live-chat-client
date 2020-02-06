@@ -134,3 +134,31 @@ h1 {
     float: right;
     font-style: italic;
 }
+
+#result{
+  background-color: white;
+}
+
+#chats {
+  background-color: $background_block_color;
+  padding: 0.2em;
+  $button_background_color: beige;
+
+  section {
+      background-color: $button_background_color;
+      border: none;
+      border-radius: 0.5em;
+      color: grey;
+      display: block;
+      font-weight: bold;
+      margin: 1em;
+      padding: 1em;
+      text-align: center;
+      width: 95%;
+
+      &:hover {
+          background-color: rgba(152, 251, 152, 0.3);
+          color: $alphabet_color;
+      }
+  }
+}
