@@ -7,6 +7,7 @@ const url = "http://192.168.1.2:8080/api/checkToken"
 
 interface HomeState {
     authenticated: boolean,
+    user?: any,
 }
 
 export default class Home extends Component<{}, HomeState>{
@@ -15,21 +16,32 @@ export default class Home extends Component<{}, HomeState>{
         super(props);
         this.state = {
             authenticated: false,
-        }
+        };
+    }
+
+    componentDidMount = () => {
         this.isAuthenticated();
     }
 
     isAuthenticated = () => {
-        axios.get(url)
-            .then(res => {
-                console.log(res.status)
-                if (res.status === 200) {
-                    this.setState({ authenticated: true })
-                }
-            })
+
+        const json = localStorage.getItem('user');
+        if (json) {
+            var user = JSON.parse(json || "");
+            var expiredIn = user.payload.exp * 1000;
+            var seconds = (new Date()).getTime();
+            console.log('kur ' + expiredIn)
+            console.log('kur ' + seconds)
+            if (expiredIn > seconds) {
+                console.log('success')
+                this.setState({ authenticated: true, user })
+            };
+        }
+
+
     }
 
     render() {
-        return this.state.authenticated ? <AuthenticatedHome /> : <UnauthemticatedHome />
+        return this.state.authenticated ? <AuthenticatedHome user={this.state.user} /> : <UnauthemticatedHome />
     }
 }

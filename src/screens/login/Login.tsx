@@ -4,8 +4,9 @@ import { Redirect } from 'react-router-dom'
 import '../styles/form.scss';
 import '../styles/index.scss';
 import Result from '../common/Result';
+import jwt_decode from 'jwt-decode';
 
-const url = "http://192.168.1.2:8080/api/login"
+const url = "http://localhost:8080/api/login"
 
 
 interface LoginState {
@@ -62,6 +63,11 @@ export default class Login extends Component<{}, LoginState>{
             .then((res) => {
                 console.log(res);
                 if (res.status === 200) {
+                    const token = res.data['id_token']
+                    const decoded = jwt_decode(token);
+
+                    localStorage.setItem('user', JSON.stringify({ 'id_token': token, 'payload': decoded }));
+                    // console.log(res.data['id_token']);
                     // this.props.history.push('/home');
                     this.setBackRedirect()
                 } else {

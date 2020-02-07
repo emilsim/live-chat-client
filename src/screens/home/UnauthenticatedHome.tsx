@@ -1,72 +1,84 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Redirect } from 'react-router-dom'
+import { Redirect, Router, withRouter } from 'react-router-dom'
 import NavBar from '../common/navbar';
 import '../styles/home.scss';
 import Chat from '../common/Chat';
+import { RouterProps, RouteComponentProps } from 'react-router';
 
 interface IHomeState {
     users?: any[],
     loading: boolean,
-    registrationRedirect: boolean,
-    loginRedirect: boolean,
+    authenticated: boolean,
+    user?: any,
 }
 
-export default class UnauthemticatedHome extends Component<{}, IHomeState> { //Component<Props, State>
+class UnauthemticatedHome extends Component<RouteComponentProps<{}>, IHomeState> { //Component<Props, State>
 
-    constructor(props: Readonly<{}>) {
+    constructor(props: any) {
         super(props);
-        this.state = { loading: false, registrationRedirect: false, loginRedirect: false };
-    }
+        var authenticated = false;
+        var payload;
 
-    setRegistrationRedirect = () => {
-        this.setState({
-            registrationRedirect: true
-        })
-    }
-
-    setLoginRedirect = () => {
-        this.setState({
-            loginRedirect: true
-        })
-    }
-
-    renderRedirect = () => {
-        if (this.state.registrationRedirect) {
-            return <Redirect to='/registration' />
+        const json = localStorage.getItem('user');
+        if (json) {
+            var user = JSON.parse(json || "");
+            var expiredIn = user.payload.exp * 1000;
+            var seconds = (new Date()).getTime();
+            authenticated = expiredIn > seconds;
+            payload = user.payload;
         }
-        if (this.state.loginRedirect) {
-            return <Redirect to='/login' />
-        }
+
+        this.state = { loading: false, authenticated, user: payload };
     }
 
-    onClick = (event: any) => {
-        this.setState({ loading: true });
-        axios.get("http://localhost:8080/api/users")
-            .then((users: any) => {
-                console.log(users);
-                this.setState({ users: users.data, loading: false });
-            }).catch((err) => {
-                console.log(err);
-                this.setState({ loading: false });
-            });
+    goToRegistration = () => {
+        this.props.history.push('/registration');
+    }
+
+    goToLogin = () => {
+        this.props.history.push('/login');
+    }
+
+    // onClick = (event: any) => {
+    //     this.setState({ loading: true });
+    //     axios.get("http://localhost:8080/api/users")
+    //         .then((users: any) => {
+    //             console.log(users);
+    //             this.setState({ users: users.data, loading: false });
+    //         }).catch((err) => {
+    //             console.log(err);
+    //             this.setState({ loading: false });
+    //         });
+    // }
+
+    logout = () => {
+        localStorage.removeItem('user');
+        this.setState( { authenticated: false, user: undefined });
     }
 
     render() {
-        const { users, loading } = this.state;
+        const { users, loading, authenticated, user } = this.state;
         return (
             <React.Fragment>
-                {this.renderRedirect()}
                 <header>
                     <nav>
                         <ul>
                             <li className="active">Начало</li>
+                            {!authenticated && 
                             <li className="right_float">
-                                Нямате регистрация? <button id="registration" onClick={this.setRegistrationRedirect}>Регистрация</button>
-                            </li>
+                                Нямате регистрация? <button id="registration" onClick={this.goToRegistration}>Регистрация</button>
+                            </li>}
+                            {!authenticated && 
                             <li className="right_float">
-                                Не сте влезнали в профила си? <button id="login" onClick={this.setLoginRedirect}>Вход</button>
+                                Не сте влезнали в профила си? <button id="login" onClick={this.goToLogin}>Вход</button>
                             </li>
+                            }
+                            {authenticated && 
+                            <li className="right_float">
+                                Здравейте {user.nickname} <button id="login" onClick={this.logout}>Изход</button>
+                            </li>
+                            }
                         </ul>
                     </nav>
                 </header>
@@ -75,7 +87,7 @@ export default class UnauthemticatedHome extends Component<{}, IHomeState> { //C
                     {<Chat chatTitle={"Глобален чат"} chatAddress={"global"} />}
                 </main>
 
-                <div>
+                {/* <div>
                     <div>Home</div>
                     <button onClick={this.onClick}>Get users</button>
                     {loading && <Loading></Loading>}
@@ -86,7 +98,7 @@ export default class UnauthemticatedHome extends Component<{}, IHomeState> { //C
                             </div>
                         })
                     }
-                </div>
+                </div> */}
             </React.Fragment>
         );
     }
@@ -97,3 +109,5 @@ class Loading extends Component {
         return <div>Lodaing...</div>
     }
 }
+
+export default withRouter(UnauthemticatedHome);

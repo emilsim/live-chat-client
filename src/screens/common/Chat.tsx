@@ -1,4 +1,5 @@
 import React, { Component, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 export default class Chat extends Component<{ chatTitle: ReactNode, chatAddress: ReactNode }, {}> {
 
@@ -6,12 +7,17 @@ export default class Chat extends Component<{ chatTitle: ReactNode, chatAddress:
         super(props)
     }
 
+    logout = () => {
+        localStorage.removeItem('user');
+        this.setState( { authenticated: false, user: undefined });
+    }
+
     render() {
         return (
             <div id="chats">
-                <a href={`/chat/${this.props.chatAddress}`}>
+                <Link to={`/chat`}>
                     <section>{this.props.chatTitle}</section>
-                </a>
+                </Link>
             </div>
         )
     }
