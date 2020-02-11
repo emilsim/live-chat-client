@@ -1,15 +1,11 @@
 import React, { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-export default class Chat extends Component<{ chatTitle: ReactNode, chatAddress: ReactNode }, {}> {
-
-    constructor(props: Readonly<{ chatTitle: any, chatAddress: any }>) {
-        super(props)
-    }
+export default class ChatBox extends Component<{ chatTitle: ReactNode, chatAddress: ReactNode }, {}> {
 
     logout = () => {
         localStorage.removeItem('user');
-        this.setState( { authenticated: false, user: undefined });
+        this.setState({ authenticated: false, user: undefined });
     }
 
     render() {

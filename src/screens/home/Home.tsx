@@ -1,47 +1,78 @@
 import React, { Component } from 'react';
-import UnauthemticatedHome from './UnauthenticatedHome';
-import AuthenticatedHome from './AuthenticatedHome';
-import axios from 'axios';
-
-const url = "http://192.168.1.2:8080/api/checkToken"
+import { withRouter } from 'react-router-dom'
+import ChatBox from '../common/ChatBox';
+import { RouteComponentProps } from 'react-router';
+import '../styles/home.scss';
 
 interface HomeState {
     authenticated: boolean,
     user?: any,
 }
 
-export default class Home extends Component<{}, HomeState>{
+class Home extends Component<RouteComponentProps<{}>, HomeState> {
 
-    constructor(props: Readonly<{}>) {
+    constructor(props: Readonly<RouteComponentProps<{}>>) {
         super(props);
-        this.state = {
-            authenticated: false,
-        };
-    }
-
-    componentDidMount = () => {
-        this.isAuthenticated();
-    }
-
-    isAuthenticated = () => {
+        let authenticated = false;
+        let payload;
 
         const json = localStorage.getItem('user');
         if (json) {
-            var user = JSON.parse(json || "");
-            var expiredIn = user.payload.exp * 1000;
-            var seconds = (new Date()).getTime();
-            console.log('kur ' + expiredIn)
-            console.log('kur ' + seconds)
-            if (expiredIn > seconds) {
-                console.log('success')
-                this.setState({ authenticated: true, user })
-            };
+            let user = JSON.parse(json || "");
+            let expiredIn = user.payload.exp * 1000;
+            let seconds = (new Date()).getTime();
+            authenticated = expiredIn > seconds;
+            payload = user.payload;
         }
 
+        this.state = { authenticated, user: payload };
+    }
 
+    goToRegistration = () => {
+        this.props.history.push('/registration');
+    }
+
+    goToLogin = () => {
+        this.props.history.push('/login');
+    }
+
+    logout = () => {
+        localStorage.removeItem('user');
+        this.setState({ authenticated: false, user: undefined });
     }
 
     render() {
-        return this.state.authenticated ? <AuthenticatedHome user={this.state.user} /> : <UnauthemticatedHome />
+        const { authenticated, user } = this.state;
+        return (
+            <React.Fragment>
+                <header>
+                    <nav>
+                        <ul>
+                            <li className="active">Начало</li>
+                            {!authenticated &&
+                                <li className="right_float">
+                                    Нямате регистрация? <button id="registration" onClick={this.goToRegistration}>Регистрация</button>
+                                </li>}
+                            {!authenticated &&
+                                <li className="right_float">
+                                    Не сте влезнали в профила си? <button id="login" onClick={this.goToLogin}>Вход</button>
+                                </li>
+                            }
+                            {authenticated &&
+                                <li className="right_float">
+                                    Здравейте {user.nickname} <button id="login" onClick={this.logout}>Изход</button>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </header>
+                <main>
+                    <h1>Присъедини се сега!</h1>
+                    {<ChatBox chatTitle={"Глобален чат"} chatAddress={"global"} />}
+                </main>
+            </React.Fragment>
+        );
     }
 }
+
+export default withRouter(Home);

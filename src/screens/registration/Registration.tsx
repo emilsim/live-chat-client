@@ -6,7 +6,7 @@ import Result from '../common/Result';
 import '../styles/index.scss';
 import '../styles/form.scss';
 
-const url = "http://192.168.1.2:8080/api/user"
+const url = "http://localhost:8080/api/user"
 
 interface RegistrationState {
     backRedirect: boolean,
@@ -57,9 +57,8 @@ export default class Registration extends Component<{}, RegistrationState> {
     }
 
     handleSubmit = (event: { preventDefault: () => void; }) => {
-        console.log(`Form submitted`)
+        // console.log(`Form submitted`)
         const user = JSON.stringify(this.state.user)
-        console.log(user)
         axios({ method: 'post', url: url, headers: { "Content-Type": "application/json" }, data: user })
             .then((res) => {
                 this.setState({ result: `Успешно се регистрирахте в системата, ${this.state.user.firstName}`, color: "#808000" });
@@ -73,36 +72,31 @@ export default class Registration extends Component<{}, RegistrationState> {
         const { firstName, lastName, email, password } = this.state.user
         // this.state.user.nickname = e.target.value
         const newNickname = e.target.value
-        this.setState(prevState => ({ user: { firstName, lastName, email, password, nickname: newNickname } }),
-            () => console.log(this.state.user))
+        this.setState(prevState => ({ user: { firstName, lastName, email, password, nickname: newNickname } }))
     }
 
     handleFirstName = (e: any) => {
         const { nickname, lastName, email, password } = this.state.user
         const newFirstName = e.target.value
-        this.setState(prevState => ({ user: { firstName: newFirstName, lastName, email, password, nickname } }),
-            () => console.log(this.state.user))
+        this.setState(prevState => ({ user: { firstName: newFirstName, lastName, email, password, nickname } }))
     }
 
     handleLastName = (e: any) => {
         const { nickname, firstName, email, password } = this.state.user
         const newLastName = e.target.value
-        this.setState(prevState => ({ user: { firstName, lastName: newLastName, email, password, nickname } }),
-            () => console.log(this.state.user))
+        this.setState(prevState => ({ user: { firstName, lastName: newLastName, email, password, nickname } }))
     }
 
     handleEmail = (e: any) => {
         const { nickname, firstName, lastName, password } = this.state.user
         const newEmail = e.target.value
-        this.setState(prevState => ({ user: { firstName, lastName, email: newEmail, password, nickname } }),
-            () => console.log(this.state.user))
+        this.setState(prevState => ({ user: { firstName, lastName, email: newEmail, password, nickname } }))
     }
 
     handlePassword = (e: any) => {
         const { nickname, firstName, lastName, email } = this.state.user
         const newPassword = e.target.value
-        this.setState(prevState => ({ user: { firstName, lastName, email, password: newPassword, nickname } }),
-            () => console.log(this.state.user))
+        this.setState(prevState => ({ user: { firstName, lastName, email, password: newPassword, nickname } }))
     }
 
     render() {
