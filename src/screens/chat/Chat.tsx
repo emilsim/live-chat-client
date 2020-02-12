@@ -8,6 +8,7 @@ import { RouteComponentProps } from "react-router";
 import { withRouter } from 'react-router-dom'
 import "../styles/index.scss"
 import "../styles/chatPage.scss"
+import Loading from "../common/Loading";
 
 const chatUsersUrl = "http://localhost:8080/api/users";
 const chatMessagesUrl = "http://localhost:8080/api/chat/global"; //chat name
@@ -33,8 +34,8 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
         let authorized = false;
         if (json) {
             user = JSON.parse(json);
-            var expiredIn = user.payload.exp * 1000;
-            var seconds = (new Date()).getTime();
+            let expiredIn = user.payload.exp * 1000;
+            let seconds = (new Date()).getTime();
             authorized = expiredIn > seconds;
         }
         this.state = {
@@ -56,9 +57,10 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
     establishConnection = () => {
 
         this.socket.on('MESSAGE_RECEIVED', (data: any) => {
-            const { senderId, senderName, message } = data;
-            const arr = [...this.state.messages, { senderId, senderName, message }];
+            const { senderId, senderName, message, createdAt } = data;
+            const arr = [...this.state.messages, { senderId, senderName, message, createdAt }];
             this.setState({ messages: arr });
+            this.scrollToBottom();
         });
 
         this.socket.on('USER_JOINED', ({ nickname, id }: any) => {
@@ -90,10 +92,10 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
         const message = this.state.message.replace(/[\r\n\v]+/g, "");
         if (message) {
             // console.log(message);
-            var data: Message = { senderId: this.state.user.payload.id, senderName: this.state.user.payload.nickname, message: this.state.message }
+            let data: Message = { senderId: this.state.user.payload.id, senderName: this.state.user.payload.nickname, message: this.state.message, createdAt: '' }
             this.socket.emit("SEND_MESSAGE", data);
             const arr = [...this.state.messages, data];
-            this.setState({ messages: arr, message: '' });
+            this.setState({ messages: arr, message: '' }, () => this.scrollToBottom());
         }
     }
 
@@ -105,23 +107,35 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
             const options = {
                 headers: { 'authorization': user.id_token }
             };
-            axios.get(chatMessagesUrl, options)
-                .then(res => {
-                    this.setState({ messages: res.data });
-                }).catch(err => {
-                    console.log("ERROR GET MESSAGES " + err)
-                })
+            this.getMessages()!.then(() => {
+                this.scrollToBottom();
+            });
             axios.get(chatUsersUrl, options).then(res => {
                 this.setState({ users: res.data });
             }).catch(err => {
                 console.log("ERROR GET MESSAGES " + err)
             })
         }
-        this.scrollToBottom();
     }
 
-    componentDidUpdate() {
-        this.scrollToBottom();
+    getMessages = () => {
+        const json = localStorage.getItem('user');
+        let user;
+        if (json) {
+            user = JSON.parse(json);
+            const createdAt = this.state.messages[0] ? this.state.messages[0].createdAt : null;
+            const options = {
+                params: { createdAt },
+                headers: { 'authorization': user.id_token }
+            };
+            return axios.get(chatMessagesUrl, options)
+                .then(res => {
+                    const messages = [...res.data, ...this.state.messages]
+                    this.setState({ messages });
+                }).catch(err => {
+                    console.log("ERROR GET MESSAGES " + err)
+                })
+        }
     }
 
     componentWillUnmount() {
@@ -132,6 +146,16 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
         animateScroll.scrollToBottom({
             containerId: "chat_content"
         });
+    }
+
+    onScroll = (e: any) => {
+        let element = e.target
+        if (element.scrollTop === 0) {
+            setTimeout(() => {
+                this.getMessages();
+                element.scrollTop = 1700;
+            }, 1500)
+        }
     }
 
     render() {
@@ -145,7 +169,6 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
                     <header>
                         <nav>
                             <ul id="participants">
-
                                 <li className="current_user">{this.state.user.payload.nickname}</li>
                                 {Object.values(this.state.users).map((nickname, i) => {
                                     if (nickname && nickname !== this.state.user.payload.nickname) {
@@ -167,7 +190,8 @@ class Chat extends Component<RouteComponentProps<{}>, ChatState> {
                                 <div id="chat_title">Глобален чат</div>
                             </div>
 
-                            <div id="chat_content" data-simplebar>
+                            <div id="chat_content" onScroll={this.onScroll} data-simplebar>
+                                <Loading />
                                 {this.state.messages.map((message, i) => {
                                     if (message.senderId === this.state.user.payload.id) {
                                         return (

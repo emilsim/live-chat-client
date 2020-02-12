@@ -36,7 +36,7 @@ $alphabet_color: #2e8b57;
     // overflow-y: scroll;
     background: rgb(255, 254, 254);
     max-height: 30em;
-    overflow: auto;
+    overflow: scroll;
   }
 
   #chat_content,
@@ -78,7 +78,7 @@ $alphabet_color: #2e8b57;
         margin-left: 93%;
       }
       .answer {
-        background: beige;
+        background: rgb(255, 225, 225);
         border-radius: 2em;
         color: black;
         display: block;
